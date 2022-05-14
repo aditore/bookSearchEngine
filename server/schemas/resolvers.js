@@ -75,4 +75,6 @@ const resolvers = {
             return updatedUser;
         }
     }
-}
+};
+
+module.exports = resolvers;

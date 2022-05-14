@@ -47,3 +47,5 @@ type Mutation {
     deleteBook(bookId: String!): User
 }
 `
+
+module.exports = typeDefs;
