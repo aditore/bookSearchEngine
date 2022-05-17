@@ -16,7 +16,7 @@ const SignupForm = () => {
   const [showAlert, setShowAlert] = useState(false);
 
   //mutation
-  const [addUser, { error }] = useMutation(ADD_USER);
+  const [addUser] = useMutation(ADD_USER);
 
 
   const handleInputChange = (event) => {
@@ -35,13 +35,13 @@ const SignupForm = () => {
     }
     //changed
     try {
-      const { data } = await addUser({
+      const response = await addUser({
         variables: { ...userFormData },
       });
 
 
-      console.log(data);
-      Auth.login(data.addUser.token);
+      console.log(response);
+      Auth.login(response.token);
     } catch (err) {
       console.error(err);
       setShowAlert(true);
@@ -59,11 +59,9 @@ const SignupForm = () => {
       {/* This is needed for the validation functionality above */}
       <Form noValidate validated={validated} onSubmit={handleFormSubmit}>
         {/* show alert if server response is bad */}
-        {error &&
-          <Alert dismissible onClose={() => setShowAlert(false)} show={showAlert} variant='danger'>
-            Something went wrong with your signup!
-          </Alert>
-        }
+        <Alert dismissible onClose={() => setShowAlert(false)} show={showAlert} variant='danger'>
+          Something went wrong with your signup!
+        </Alert>
 
         <Form.Group>
           <Form.Label htmlFor='username'>Username</Form.Label>

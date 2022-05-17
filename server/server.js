@@ -15,7 +15,6 @@ const PORT = process.env.PORT || 3001;
 const server = new ApolloServer({
   typeDefs,
   resolvers,
-  context: authMiddleware
 });
 
 app.use(express.urlencoded({ extended: true }));
@@ -27,10 +26,6 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 //app.use(routes);
-app.get('*', (_req, res) => {
-  res.sendFile(path.join(__dirname, '../client/build/index.html'));
-});
-
 //apply Apollo Server
 const startApolloServer = async (typeDefs, resolvers) => {
   await server.start();
