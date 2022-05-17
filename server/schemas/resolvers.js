@@ -4,10 +4,11 @@ const { signToken } = require('../utils/auth');
 
 const resolvers = {
     Query: {
-        me: async (_parent, _args, context) => {
+        me: async (parent, args, context) => {
             if (context.user) {
                 const userData = await User.findOne({ _id: context.user._id })
-                .select('-__v -password');
+                .select('-__v -password')
+                .populate('books');
   
                 return userData;
             }
@@ -17,13 +18,13 @@ const resolvers = {
 
     Mutation: {
         //add user and give token
-        addUser: async (_parent, args) => {
+        addUser: async (parent, args) => {
             const user = await User.create(args);
             const token = signToken(user);
             return { token, user };
         },
         //login and give token
-        login: async (_parent, { email, password }) => {
+        login: async (parent, { email, password }) => {
             const user = await User.findOne({ email });
 
             if (!user) {
@@ -41,12 +42,12 @@ const resolvers = {
             return { token, user };
         },
         //save book to savedBooks
-        saveBook: async (_parent, { input }, context) => {
+        saveBook: async (parent, args, context) => {
             if (context.user) {
                 console.log(context.user);
                 const updatedUser = await User.findByIdAndUpdate(
                     { _id: context.user._id },
-                    { $push: { savedBooks: input } },
+                    { $addToSet: { savedBooks: args.input } },
                     { new: true, runValidators: true }
                 );
                 return updatedUser;
@@ -56,11 +57,11 @@ const resolvers = {
         }, 
               
         //delete book from savedBooks
-        deleteBook: async (_parent, { bookId }, context) => {
+        deleteBook: async (parent, args, context) => {
             if (context.user) {
                 const updatedUser = await User.findOneAndUpdate(
                     { _id: context.user._id },
-                    { $pull: { savedBooks: { bookId } } },
+                    { $pull: { savedBooks: args.bookId } },
                     { new: true }
                 );
                 return updatedUser;
