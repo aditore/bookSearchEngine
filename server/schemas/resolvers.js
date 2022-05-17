@@ -4,17 +4,12 @@ const { signToken } = require('../utils/auth');
 
 const resolvers = {
     Query: {
-        me: async (parent, { user = null, params }) => {
-            const foundUser = await User.findOne({
-                $or: [{ _id: user ? user._id : params.id }, { username: params.username }],
-            });
-
-            if (!foundUser) {
-                return { message: 'Cannot find a user with this id!' };
+        me: async (parent, args, context) => {
+            if (context.user) {
+              return User.findOne({ _id: context.user._id });
             }
-            
-            return foundUser;
-        },
+            throw new AuthenticationError('You need to be logged in!');
+        }
     },
 
     Mutation: {
@@ -43,31 +38,32 @@ const resolvers = {
             return { token, user };
         },
         //save book to savedBooks
-        saveBook: async (parent, { user, body }) => {
-            console.log(user);
-            try {
-              const updatedUser = await User.findOneAndUpdate(
-                { _id: user._id },
-                { $addToSet: { savedBooks: body } },
-                { new: true, runValidators: true }
-              );
-              return updatedUser;
-            } catch (err) {
-              console.log(err);
-              return err;
+        saveBook: async (parent, args, context) => {
+            if (context.user) {
+                console.log(context.user);
+                const updatedUser = await User.findOneAndUpdate(
+                    { _id: context.user._id },
+                    { $addToSet: { savedBooks: args.input } },
+                    { new: true, runValidators: true }
+                );
+                return updatedUser;
             }
-        },
+            
+            throw new AuthenticationError('Please log in!')
+        }, 
+              
         //delete book from savedBooks
-        deleteBook: async (parent, { user, params }) => {
-            const updatedUser = await User.findOneAndUpdate(
-              { _id: user._id },
-              { $pull: { savedBooks: { bookId: params.bookId } } },
-              { new: true }
-            );
-            if (!updatedUser) {
-              return { message: "Couldn't find user with this id!" };
+        deleteBook: async (parent, args, context) => {
+            if (context.user) {
+                const updatedUser = await User.findOneAndUpdate(
+                    { _id: context.user._id },
+                    { $pull: { savedBooks: { bookId: args.bookId } } },
+                    { new: true }
+                );
+                return updatedUser;
             }
-            return updatedUser;
+
+            throw new AuthenticationError('Please log in!')
         }
     }
 };
