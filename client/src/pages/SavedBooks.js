@@ -12,13 +12,13 @@ import { removeBookId } from '../utils/localStorage';
 const SavedBooks = () => {
 
   const { loading, data } = useQuery(GET_ME);
-  const [removeBook, { error }] = useMutation(REMOVE_BOOK);
+  const [removeBook] = useMutation(REMOVE_BOOK);
 
-  console.log(data);
+  //console.log(data);
 
   const userData = data?.me || {};
 
-  console.log(userData);
+  //console.log(userData);
 
   // create function that accepts the book's mongo _id value as param and deletes the book from the database
   const handleDeleteBook = async (bookId) => {
@@ -72,7 +72,6 @@ const SavedBooks = () => {
                   <Button className='btn-block btn-danger' onClick={() => handleDeleteBook(book.bookId)}>
                     Delete this Book!
                   </Button>
-                  {error && <div>Something went wrong</div>}
                 </Card.Body>
               </Card>
             );
