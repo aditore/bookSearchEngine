@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Jumbotron, Container, CardColumns, Card, Button } from 'react-bootstrap';
 
 import { useMutation, useQuery } from '@apollo/client';
@@ -12,11 +12,11 @@ import { removeBookId } from '../utils/localStorage';
 const SavedBooks = () => {
 
   const { loading, data } = useQuery(GET_ME);
-  const [removeBook] = useMutation(REMOVE_BOOK);
+  const [removeBook, { error }] = useMutation(REMOVE_BOOK);
 
   console.log(data);
-  
-  const userData = data?.me || [];
+
+  const userData = data?.me || {};
 
   console.log(userData);
 
@@ -31,12 +31,12 @@ const SavedBooks = () => {
     try {
       //const response = await deleteBook(bookId, token);
 
-      const { data } = await removeBook({
+      await removeBook({
         variables: { bookId }
       });
       
       // upon success, remove book's id from localStorage
-      removeBookId(data.bookId);
+      removeBookId(bookId);
     } catch (err) {
       console.error(err);
     }
@@ -56,12 +56,12 @@ const SavedBooks = () => {
       </Jumbotron>
       <Container>
         <h2>
-          {userData.savedBooks.length
+          {userData.savedBooks?.length
             ? `Viewing ${userData.savedBooks.length} saved ${userData.savedBooks.length === 1 ? 'book' : 'books'}:`
             : 'You have no saved books!'}
         </h2>
         <CardColumns>
-          {userData.savedBooks.map((book) => {
+          {userData.savedBooks?.map((book) => {
             return (
               <Card key={book.bookId} border='dark'>
                 {book.image ? <Card.Img src={book.image} alt={`The cover for ${book.title}`} variant='top' /> : null}
@@ -72,6 +72,7 @@ const SavedBooks = () => {
                   <Button className='btn-block btn-danger' onClick={() => handleDeleteBook(book.bookId)}>
                     Delete this Book!
                   </Button>
+                  {error && <div>Something went wrong</div>}
                 </Card.Body>
               </Card>
             );
