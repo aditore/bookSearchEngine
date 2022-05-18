@@ -87,7 +87,7 @@ THEN I am logged out of the site and presented with a menu with the options Sear
 
 ## Credits
 
-See the deployed page at: </br>
+See the deployed page at: https://book-search-engine-aditore.herokuapp.com/</br>
 
 Starter Code By: UW-Bootcamp</br>
 Code within application by: Anthony Ditore</br>
